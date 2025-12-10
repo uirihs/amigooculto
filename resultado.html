@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Resultado</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-light">
+
+<div class="container py-5">
+  <div class="card p-4 text-center shadow-lg">
+    <h1 id="nome"></h1>
+    <h2 class="mt-4" id="cor"></h2>
+    <h3 class="mt-3" id="alvo"></h3>
+
+    <a href="index.html" class="btn btn-primary mt-4">Voltar</a>
+  </div>
+</div>
+
+<script>
+
+  // LISTAS
+  let cores = ["vermelho","verde","amarelo","preto","roxo","cinza","azul","laranja","branco","rosa"];
+  let pessoas = ["Kauã","Lívia","Valentina","Lele"];
+
+  // PEGA O NOME NA URL
+  let params = new URLSearchParams(location.search);
+  let nome = params.get("nome");
+
+  // MOSTRA O NOME NA TELA
+  document.getElementById("nome").innerText = nome;
+
+  // PEGA RESULTADOS SALVOS
+  let dados = JSON.parse(localStorage.getItem("dados")) || {};
+
+  // SE A PESSOA JÁ SORTEOU:
+  if (dados[nome]) {
+    document.getElementById("cor").innerText = "Cor: " + dados[nome].cor;
+    document.getElementById("alvo").innerText = "Você vai presentear: " + dados[nome].alvo;
+  } else {
+
+    // REMOVE A PRÓPRIA PESSOA DA LISTA (não pode presentear ela mesma)
+    let possiveis = pessoas.filter(p => p !== nome);
+
+    // FILTRA ALVOS JÁ USADOS
+    let usados = Object.values(dados).map(x => x.alvo);
+    let restantes = possiveis.filter(p => !usados.includes(p));
+
+    // SORTEIA UMA COR NÃO USADA
+    let coresUsadas = Object.values(dados).map(x => x.cor);
+    let coresRestantes = cores.filter(c => !coresUsadas.includes(c));
+
+    // SORTEIO
+    let cor = coresRestantes[Math.floor(Math.random() * coresRestantes.length)];
+    let alvo = restantes[Math.floor(Math.random() * restantes.length)];
+
+    // SALVA
+    dados[nome] = { cor: cor, alvo: alvo };
+    localStorage.setItem("dados", JSON.stringify(dados));
+
+    // MOSTRA NA TELA
+    document.getElementById("cor").innerText = "Cor: " + cor;
+    document.getElementById("alvo").innerText = "Você vai presentear: " + alvo;
+  }
+
+</script>
+
+</body>
+</html>
